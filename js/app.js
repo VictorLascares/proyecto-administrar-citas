@@ -27,11 +27,11 @@ class UI {
       divMensaje.classList.add('alert-success');
     }
     divMensaje.textContent = mensaje;
-    document.querySelector('#contenido').insertBefore(divMensaje, document.querySelector('#agregar-cita'));
+    document.querySelector('#contenido').insertBefore(divMensaje, document.querySelector('.agregar-cita'));
 
     setTimeout(() => {
       divMensaje.remove();
-    }, 5000);
+    }, 3000);
   }
 }
 
