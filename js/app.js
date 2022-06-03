@@ -8,7 +8,7 @@ const sintomasInput = document.querySelector('#sintomas');
 
 
 const formulario = document.querySelector('#nueva-cita');
-const contenedorCitas = document.querySelector('#cita');
+const contenedorCitas = document.querySelector('#citas');
 
 class Citas {
   constructor() {
@@ -37,6 +37,63 @@ class UI {
     setTimeout(() => {
       divMensaje.remove();
     }, 3000);
+  }
+
+  imprimirCitas({ citas }) {
+    this.limpiarHTML()
+
+    citas.forEach(cita => {
+      const { mascota, propietario, telefono, fecha, hora, sintomas, id } = cita;
+      const divCita = document.createElement('div');
+      divCita.classList.add('cita', 'p-3');
+      divCita.dataset.id = id;
+
+      const mascotaParrafo = document.createElement('h2');
+      mascotaParrafo.classList.add('card-title', 'fw-bold');
+      mascotaParrafo.textContent = mascota;
+
+      const propietarioParrafo = document.createElement('p');
+      propietarioParrafo.innerHTML = `
+        <span class="fw-bold">Propietario: </span> ${propietario}
+      `;
+
+      const telefonoParrafo = document.createElement('p');
+      telefonoParrafo.innerHTML = `
+        <span class="fw-bold">Telefono: </span> ${telefono}
+      `;
+
+      const fechaParrafo = document.createElement('p');
+      fechaParrafo.innerHTML = `
+        <span class="fw-bold">Fecha: </span> ${fecha}
+      `;
+
+      const horaParrafo = document.createElement('p');
+      horaParrafo.innerHTML = `
+        <span class="fw-bold">Hora: </span> ${hora}
+      `;
+
+      const sintomasParrafo = document.createElement('p');
+      sintomasParrafo.innerHTML = `
+        <span class="fw-bold">Sintomas: </span> ${sintomas}
+      `;
+
+      // Agregar los parrafos al divCita
+      divCita.appendChild(mascotaParrafo);
+      divCita.appendChild(propietarioParrafo);
+      divCita.appendChild(telefonoParrafo);
+      divCita.appendChild(fechaParrafo);
+      divCita.appendChild(horaParrafo);
+      divCita.appendChild(sintomasParrafo);
+
+      // Agregar las citas al HTML
+      contenedorCitas.appendChild(divCita);
+    })
+  }
+
+  limpiarHTML() {
+    while(contenedorCitas.firstChild) {
+      contenedorCitas.removeChild(contenedorCitas.firstChild);
+    }
   }
 }
 
@@ -95,6 +152,9 @@ function nuevaCita(e) {
 
   // Reiniciar el formulario
   formulario.reset();
+
+  // Mostrar el HTMl de las citas
+  ui.imprimirCitas(administrarCitas);
 }
 
 function reiniciarObjeto() {
