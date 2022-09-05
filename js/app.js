@@ -1,5 +1,5 @@
 import { mascotaInput, propietarioInput, telefonoInput,fechaInput, horaInput, sintomasInput, formulario } from './selectores.js';
-import  { datosCita, nuevaCita } from './funciones.js'
+import  { datosCita, nuevaCita, crearDB } from './funciones.js'
 
 window.onload =  function () {
   mascotaInput.addEventListener('input', datosCita);
@@ -10,5 +10,7 @@ window.onload =  function () {
   sintomasInput.addEventListener('input', datosCita);
 
   formulario.addEventListener('submit', nuevaCita);
+
+  crearDB();
 }
 
