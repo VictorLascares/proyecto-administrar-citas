@@ -35,16 +35,28 @@ function nuevaCita(e) {
   }
 
   if(editando) {
-    ui.imprimirAlerta('Cita editada correctamente');
-
     // Pasar el objeto de la cita a edicion
     administrarCitas.editarCita({...citaObj})
 
-    // Regresar el texto del boton a sus estado original
-    formulario.querySelector('button[type="submit"]').textContent = 'Crear cita';
+    // Edita en IndexDB
+    const transaction = DB.transaction(['citas'], 'readwrite');
+    const objectStore = transaction.objectStore('citas');
 
-    // Quitar modo edición
-    editando = false;
+    objectStore.put(citaObj);
+
+    transaction.oncomplete = () => {
+      ui.imprimirAlerta('Cita editada correctamente');
+      // Regresar el texto del boton a sus estado original
+      formulario.querySelector('button[type="submit"]').textContent = 'Crear cita';
+
+      // Quitar modo edición
+      editando = false; 
+    }
+
+    transaction.onerror = () => {
+      console.log('Ocurrio un error');
+    }
+
   } else {
     // Generar un id unico
     citaObj.id = Date.now();
@@ -71,7 +83,7 @@ function nuevaCita(e) {
   formulario.reset();
 
   // Mostrar el HTMl de las citas
-  ui.imprimirCitas(administrarCitas);
+  ui.imprimirCitas(DB);
 }
 
 function reiniciarObjeto() {
@@ -84,14 +96,23 @@ function reiniciarObjeto() {
 }
 
 function eliminarCita(id) {
-  // Eliminar la cita
-  administrarCitas.eliminarCita(id);
+  const transaction = DB.transaction(['citas'], 'readwrite');
+  const objectStore = transaction.objectStore('citas');
 
-  // Mostrar un mensaje
-  ui.imprimirAlerta('Cita eliminada correctamente')
+  objectStore.delete(id);
 
-  // Refrescar las citas
-  ui.imprimirCitas(DB)
+  transaction.oncomplete = () => {
+    // Mostrar un mensaje
+    ui.imprimirAlerta('Cita eliminada correctamente')
+
+    // Refrescar las citas
+    ui.imprimirCitas(DB)
+  }
+
+  transaction.onerror = () => {
+    console.log('Ocurrio un error al tratar de eliminar la cita');
+  }
+
 }
 
 function cargarEdicion(cita) {

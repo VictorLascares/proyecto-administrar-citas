@@ -82,6 +82,7 @@ class UI {
         btnEditar.classList.add('btn', 'btn-primary');
         btnEditar.textContent = 'Editar';
 
+        const cita = cursor.value;
         btnEditar.onclick = () => cargarEdicion(cita);
 
         // Agregar los parrafos al divCita
