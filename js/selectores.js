@@ -7,5 +7,6 @@ const sintomasInput = document.querySelector('#sintomas');
 
 const formulario = document.querySelector('#nueva-cita');
 const contenedorCitas = document.querySelector('#citas');
+const heading = document.querySelector('#administra');
 
-export { mascotaInput, propietarioInput, telefonoInput, fechaInput, horaInput, sintomasInput, formulario, contenedorCitas };
+export { mascotaInput, propietarioInput, telefonoInput, fechaInput, horaInput, sintomasInput, formulario, contenedorCitas, heading };

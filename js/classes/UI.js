@@ -1,5 +1,5 @@
 import { eliminarCita, cargarEdicion } from '../funciones.js';
-import { contenedorCitas } from '../selectores.js';
+import { contenedorCitas, heading } from '../selectores.js';
 
 class UI {
   imprimirAlerta(mensaje, tipo) {
@@ -19,71 +19,97 @@ class UI {
     }, 3000);
   }
 
-  imprimirCitas({ citas }) {
+  imprimirCitas(DB) {
     this.limpiarHTML()
 
-    citas.forEach(cita => {
-      const { mascota, propietario, telefono, fecha, hora, sintomas, id } = cita;
-      const divCita = document.createElement('div');
-      divCita.classList.add('cita', 'p-3');
-      divCita.dataset.id = id;
+    // Leer el contenido de la base de datos
+    const objectStore = DB.transaction('citas').objectStore('citas');
 
-      const mascotaParrafo = document.createElement('h2');
-      mascotaParrafo.classList.add('card-title', 'fw-bold');
-      mascotaParrafo.textContent = mascota;
+    const fnTextoHeading = this.textoHeading;
+    const total = objectStore.count();
 
-      const propietarioParrafo = document.createElement('p');
-      propietarioParrafo.innerHTML = `
-        <span class="fw-bold">Propietario: </span> ${propietario}
-      `;
+    total.onsuccess = function() {
+      fnTextoHeading(total.result);
+    }
 
-      const telefonoParrafo = document.createElement('p');
-      telefonoParrafo.innerHTML = `
-        <span class="fw-bold">Telefono: </span> ${telefono}
-      `;
+    objectStore.openCursor().onsuccess = function(e) {
+      const cursor = e.target.result;
 
-      const fechaParrafo = document.createElement('p');
-      fechaParrafo.innerHTML = `
-        <span class="fw-bold">Fecha: </span> ${fecha}
-      `;
+      if (cursor) { 
+        const { mascota, propietario, telefono, fecha, hora, sintomas, id } = cursor.value;
+        const divCita = document.createElement('div');
+        divCita.classList.add('cita', 'p-3');
+        divCita.dataset.id = id;
 
-      const horaParrafo = document.createElement('p');
-      horaParrafo.innerHTML = `
-        <span class="fw-bold">Hora: </span> ${hora}
-      `;
+        const mascotaParrafo = document.createElement('h2');
+        mascotaParrafo.classList.add('card-title', 'fw-bold');
+        mascotaParrafo.textContent = mascota;
 
-      const sintomasParrafo = document.createElement('p');
-      sintomasParrafo.innerHTML = `
-        <span class="fw-bold">Sintomas: </span> ${sintomas}
-      `;
+        const propietarioParrafo = document.createElement('p');
+        propietarioParrafo.innerHTML = `
+          <span class="fw-bold">Propietario: </span> ${propietario}
+        `;
 
-      // Boton para eliminar esta cita
-      const btnEliminar = document.createElement('button');
-      btnEliminar.classList.add('btn', 'btn-danger', 'mr-2');
-      btnEliminar.textContent = 'Eliminar';
+        const telefonoParrafo = document.createElement('p');
+        telefonoParrafo.innerHTML = `
+          <span class="fw-bold">Telefono: </span> ${telefono}
+        `;
 
-      btnEliminar.onclick = () => eliminarCita(id);
+        const fechaParrafo = document.createElement('p');
+        fechaParrafo.innerHTML = `
+          <span class="fw-bold">Fecha: </span> ${fecha}
+        `;
 
-      // Boton para editar una cita
-      const btnEditar = document.createElement('button');
-      btnEditar.classList.add('btn', 'btn-primary');
-      btnEditar.textContent = 'Editar';
+        const horaParrafo = document.createElement('p');
+        horaParrafo.innerHTML = `
+          <span class="fw-bold">Hora: </span> ${hora}
+        `;
 
-      btnEditar.onclick = () => cargarEdicion(cita);
+        const sintomasParrafo = document.createElement('p');
+        sintomasParrafo.innerHTML = `
+          <span class="fw-bold">Sintomas: </span> ${sintomas}
+        `;
 
-      // Agregar los parrafos al divCita
-      divCita.appendChild(mascotaParrafo);
-      divCita.appendChild(propietarioParrafo);
-      divCita.appendChild(telefonoParrafo);
-      divCita.appendChild(fechaParrafo);
-      divCita.appendChild(horaParrafo);
-      divCita.appendChild(sintomasParrafo);
-      divCita.appendChild(btnEliminar);
-      divCita.appendChild(btnEditar);
+        // Boton para eliminar esta cita
+        const btnEliminar = document.createElement('button');
+        btnEliminar.classList.add('btn', 'btn-danger', 'mr-2');
+        btnEliminar.textContent = 'Eliminar';
 
-      // Agregar las citas al HTML
-      contenedorCitas.appendChild(divCita);
-    })
+        btnEliminar.onclick = () => eliminarCita(id);
+
+        // Boton para editar una cita
+        const btnEditar = document.createElement('button');
+        btnEditar.classList.add('btn', 'btn-primary');
+        btnEditar.textContent = 'Editar';
+
+        btnEditar.onclick = () => cargarEdicion(cita);
+
+        // Agregar los parrafos al divCita
+        divCita.appendChild(mascotaParrafo);
+        divCita.appendChild(propietarioParrafo);
+        divCita.appendChild(telefonoParrafo);
+        divCita.appendChild(fechaParrafo);
+        divCita.appendChild(horaParrafo);
+        divCita.appendChild(sintomasParrafo);
+        divCita.appendChild(btnEliminar);
+        divCita.appendChild(btnEditar);
+
+        // Agregar las citas al HTML
+        contenedorCitas.appendChild(divCita);
+
+
+        // Ve al siguiente elemento
+        cursor.continue();
+      }
+    }
+  }
+
+  textoHeading(resultado) {
+    if (resultado > 0) {
+      heading.textContent = 'Administra tus citas';
+    } else {
+      heading.textContent = 'Todavia no hay citas';
+    }
   }
 
   limpiarHTML() {

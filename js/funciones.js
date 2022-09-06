@@ -52,8 +52,16 @@ function nuevaCita(e) {
     // Creando una nueva cita
     administrarCitas.agregarCita({ ...citaObj });
 
-    // Mensaje de agregada correctamente
-    ui.imprimirAlerta('Cita agregada correctamente');
+    // Insertar Registro en IndexDB
+    const transaction = DB.transaction(['citas'], 'readwrite');
+    const objectStore = transaction.objectStore('citas');
+    objectStore.add(citaObj);
+
+    transaction.oncomplete = function() {
+      // Mensaje de agregada correctamente
+      ui.imprimirAlerta('Cita agregada correctamente');
+    }
+
   }
   
   // Reiniciar el objeto para la validacion
@@ -83,7 +91,7 @@ function eliminarCita(id) {
   ui.imprimirAlerta('Cita eliminada correctamente')
 
   // Refrescar las citas
-  ui.imprimirCitas(administrarCitas)
+  ui.imprimirCitas(DB)
 }
 
 function cargarEdicion(cita) {
@@ -125,6 +133,7 @@ function crearDB() {
   // Si todo sale bien
   crearDB.onsuccess = function() {
     DB = crearDB.result;
+    ui.imprimirCitas(DB);
   }
 
   // Definir el schema
